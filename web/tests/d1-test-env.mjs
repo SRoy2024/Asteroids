@@ -1,9 +1,9 @@
 import { DatabaseSync } from 'node:sqlite';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 const sqlite = new DatabaseSync(':memory:');
-sqlite.exec(readFileSync(new URL('../drizzle/0000_equal_iceman.sql', import.meta.url), 'utf8'));
+for (const file of readdirSync(new URL('../drizzle/', import.meta.url)).filter(f => f.endsWith('.sql')).sort()) sqlite.exec(readFileSync(new URL('../drizzle/' + file, import.meta.url), 'utf8'));
 // Minimal D1 adapter: production SQL executes against a real SQLite database.
-export const env = { DB: { prepare(sql) {
+export const env = { DB: { async batch(statements) { return Promise.all(statements.map(s => s.run())); }, prepare(sql) {
   const statement = sqlite.prepare(sql);
   const bound = (params = []) => ({
     bind(...values) { return bound(values); },

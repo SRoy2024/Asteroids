@@ -1,20 +1,34 @@
-# Asteroids — Orbital Arcade
+# Asteroids — Neon Sector
 
-A Python/Pygame Asteroids game by **Soham Roy**, now extended with a playable browser edition and persistent global leaderboard.
+A retro arcade by **Soham Roy**: live multiplayer trail battles inspired by Snake.io, offline bot practice, and a browser edition of the original Python/Pygame Asteroids game.
 
-![Browser arcade preview](web/docs/preview.jpg)
+**[Play online](https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/)**
 
-## Browser edition
+![Retro arcade cabinet](web/docs/preview.jpg)
 
-**[Play online](https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/)** — publicly playable, with a persistent global leaderboard.
+## Pick your cartridge
 
-Open [`web/README.md`](web/README.md) for setup, controls, architecture, API documentation, testing, deployment, and a project demo walkthrough.
+- **Multiplayer arena:** eight-player public rooms. Collect energy, grow a neon trail, boost, and cut off rivals. Create a room and share the six-character code to play with friends.
+- **Bot practice:** offline trail-arena training with four clearly labelled computer opponents. Practice never submits global scores.
+- **Classic Asteroids:** the original shooting/splitting game, with ranked flights and solo practice. Classic scores are verified by server-side replay.
 
-- Responsive arcade interface with keyboard and touch controls.
-- Ranked and offline practice modes; three lives and two-minute flights.
-- All-time and weekly leaderboards, personal bests, and retry-safe saves.
-- Server-side replay verification calculates scores from recorded controls.
-- React/TypeScript Canvas game, Worker API, and D1/SQLite database.
+The cabinet UI includes cyan/magenta neon trim, a marquee, CRT scanlines, flickering tubes, stickers, screw details, joystick/button trim, and worn poster graphics. CRT FX can be switched off; reduced-motion preferences are respected.
+
+## Architecture
+
+React + TypeScript + Canvas, Vinext/Cloudflare Worker API, and D1/SQLite persistence. Multiplayer rooms synchronize approximately every 300 ms over HTTP; version-checked updates protect shared state, while the server calculates movement, growth, collisions and scores. This is a small-room casual prototype, with network/input latency and no public-scale load testing. Full setup, API, gameplay rules, quotas, identity limits and demo instructions are in [`web/README.md`](web/README.md).
+
+## Run the browser edition
+
+```sh
+cd web
+pnpm install --frozen-lockfile
+pnpm run build
+# Apply both local D1 migrations as documented in web/README.md.
+pnpm run dev
+```
+
+`pnpm run test` runs eleven gameplay, replay, API, concurrency and capacity tests. `pnpm run typecheck` checks TypeScript.
 
 ## Original desktop game
 
@@ -27,19 +41,5 @@ python main.py
 ```
 
 Use W/A/S/D to move and rotate, and Space to shoot. Large asteroids split into smaller ones.
-
-## Browser development
-
-```sh
-cd web
-pnpm install --frozen-lockfile
-pnpm run build
-# Apply the initial local database migration as documented in web/README.md.
-pnpm run dev
-```
-
-`pnpm run test` runs seven engine/replay/API tests. `pnpm run typecheck` checks TypeScript.
-
-This browser edition is solo play with shared online rankings. Pilot identities are browser-based; names are public and nonunique. Replay verification prevents directly fabricated scores but does not prevent bots. See the documented limits in the browser README.
 
 Public credit: Soham Roy.

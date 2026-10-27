@@ -14,21 +14,21 @@ function rockPath(ctx: CanvasRenderingContext2D, rock: Body, time: number) {
     const x = Math.cos(a) * radius, y = Math.sin(a) * radius;
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
-  ctx.closePath(); ctx.fillStyle = "#251f1a"; ctx.fill();
-  ctx.strokeStyle = "#b9a188"; ctx.lineWidth = 1.6; ctx.stroke();
+  ctx.closePath(); ctx.fillStyle = "#22102e"; ctx.fill();
+  ctx.strokeStyle = "#c48aff"; ctx.lineWidth = 1.6; ctx.stroke();
   ctx.beginPath(); ctx.moveTo(-rock.radius * .25, -rock.radius * .4); ctx.lineTo(rock.radius * .1, -rock.radius * .15); ctx.lineTo(rock.radius * .3, -rock.radius * .3);
-  ctx.strokeStyle = "#6b5947"; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
+  ctx.strokeStyle = "#7e438e"; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
 }
 function shipPath(ctx: CanvasRenderingContext2D, p: Body, thrust: boolean, time: number, shield = false) {
   ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle);
   if (thrust) {
     ctx.beginPath(); ctx.moveTo(-15, -7); ctx.lineTo(-34 - Math.sin(time * 38) * 9, 0); ctx.lineTo(-15, 7);
-    ctx.fillStyle = "#c8f99b"; ctx.shadowColor = "#b9ff83"; ctx.shadowBlur = 18; ctx.fill(); ctx.shadowBlur = 0;
+    ctx.fillStyle = "#45d7ff"; ctx.shadowColor = "#2fcaff"; ctx.shadowBlur = 18; ctx.fill(); ctx.shadowBlur = 0;
   }
   ctx.beginPath(); ctx.moveTo(23, 0); ctx.lineTo(-15, -14); ctx.lineTo(-9, 0); ctx.lineTo(-15, 14); ctx.closePath();
-  ctx.fillStyle = "#182c22"; ctx.strokeStyle = "#d1ffad"; ctx.lineWidth = 2.2;
-  ctx.shadowColor = "#b9ff83"; ctx.shadowBlur = 15; ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
-  if (shield) { ctx.beginPath(); ctx.arc(0, 0, 33, 0, Math.PI * 2); ctx.strokeStyle = "#c9f99a65"; ctx.lineWidth = 1; ctx.setLineDash([3, 6]); ctx.stroke(); }
+  ctx.fillStyle = "#101d45"; ctx.strokeStyle = "#88efff"; ctx.lineWidth = 2.2;
+  ctx.shadowColor = "#2fcaff"; ctx.shadowBlur = 15; ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+  if (shield) { ctx.beginPath(); ctx.arc(0, 0, 33, 0, Math.PI * 2); ctx.strokeStyle = "#56d9ff65"; ctx.lineWidth = 1; ctx.setLineDash([3, 6]); ctx.stroke(); }
   ctx.restore();
 }
 export const GameCanvas = forwardRef<CanvasHandle, { onEnd: (flight: Flight) => void; onTick: (s: { score: number; lives: number; frame: number; hits: number }) => void; onPause: () => void; sound: boolean }>(function GameCanvas({ onEnd, onTick, onPause, sound }, ref) {
@@ -86,28 +86,28 @@ export const GameCanvas = forwardRef<CanvasHandle, { onEnd: (flight: Flight) => 
             beep(event.kind === "rock" ? 130 : 60, .18, .035);
             if (!reduced) for (let i = 0; i < 14; i++) {
               const a = Math.random() * Math.PI * 2, velocity = 35 + Math.random() * 160;
-              particles.current.push({ x: event.x, y: event.y, vx: Math.cos(a) * velocity, vy: Math.sin(a) * velocity, life: .7, color: event.kind === "ship" ? "#c9f99a" : "#e6af7c" });
+              particles.current.push({ x: event.x, y: event.y, vx: Math.cos(a) * velocity, vy: Math.sin(a) * velocity, life: .7, color: event.kind === "ship" ? "#56d9ff" : "#ff3c74" });
             }
           }
           if (s.frame % 6 === 0 || s.ended) callbacks.current.onTick({ score: s.score, lives: s.lives, frame: s.frame, hits: s.hits });
           if (s.ended) finish();
         }
       } else accumulator = 0;
-      ctx.fillStyle = "#101713"; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+      ctx.fillStyle = "#080c20"; ctx.fillRect(0, 0, WIDTH, HEIGHT);
       const glow = ctx.createRadialGradient(WIDTH * .55, HEIGHT * .52, 0, WIDTH * .55, HEIGHT * .52, 640);
-      glow.addColorStop(0, "#21352560"); glow.addColorStop(1, "#10171300"); ctx.fillStyle = glow; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+      glow.addColorStop(0, "#36217860"); glow.addColorStop(1, "#080c2000"); ctx.fillStyle = glow; ctx.fillRect(0, 0, WIDTH, HEIGHT);
       for (let i = 0; i < 150; i++) {
         const x = ((i * 739 + 19) % WIDTH), y = ((i * 419 + 83) % HEIGHT);
-        ctx.fillStyle = i % 8 === 0 ? "#a8b5a9" : "#627168";
+        ctx.fillStyle = i % 8 === 0 ? "#abb7ed" : "#6174b4";
         ctx.globalAlpha = reduced ? .6 : .3 + Math.abs(Math.sin(i + now / 3200)) * .5;
         ctx.fillRect(x, y, i % 9 === 0 ? 2 : 1, i % 9 === 0 ? 2 : 1);
       }
       ctx.globalAlpha = 1;
-      ctx.strokeStyle = "#78928013"; ctx.lineWidth = 1;
+      ctx.strokeStyle = "#7f91db13"; ctx.lineWidth = 1;
       for (const radius of [145, 280, 425, 565]) { ctx.beginPath(); ctx.ellipse(WIDTH / 2, HEIGHT / 2, radius, radius * .8, -.25, 0, Math.PI * 2); ctx.stroke(); }
       if (s) {
         for (const r of s.rocks) rockPath(ctx, r, 0);
-        ctx.strokeStyle = "#ddffbd"; ctx.lineWidth = 3;
+        ctx.strokeStyle = "#ff6eac"; ctx.lineWidth = 3;
         for (const b of s.bullets) {
           ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - b.vx / 75, b.y - b.vy / 75); ctx.stroke();
         }
@@ -117,7 +117,7 @@ export const GameCanvas = forwardRef<CanvasHandle, { onEnd: (flight: Flight) => 
         const positions = [[180, 148, 57], [1060, 190, 68], [941, 560, 42], [278, 559, 34], [781, 95, 22], [1128, 410, 23], [439, 195, 21]];
         positions.forEach(([x, y, r], i) => rockPath(ctx, { x: x + Math.sin(t * .2 + i) * 13, y: y + Math.cos(t * .14 + i) * 12, radius: r, id: i + 1, angle: i, vx: 0, vy: 0 }, reduced ? 0 : t * .035));
         ctx.save(); ctx.translate(870, 352); ctx.rotate(-.48);
-        const trail = ctx.createLinearGradient(-240, 0, 0, 0); trail.addColorStop(0, "#b8e99a00"); trail.addColorStop(1, "#b8e99a45");
+        const trail = ctx.createLinearGradient(-240, 0, 0, 0); trail.addColorStop(0, "#6ac6ff00"); trail.addColorStop(1, "#6ac6ff45");
         ctx.fillStyle = trail; ctx.beginPath(); ctx.moveTo(-250, -2); ctx.lineTo(-10, -13); ctx.lineTo(-10, 13); ctx.closePath(); ctx.fill(); ctx.restore();
         shipPath(ctx, { x: 870, y: 352, angle: -.48, radius: 20, id: 0, vx: 0, vy: 0 }, true, t);
       }

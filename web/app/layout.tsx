@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Asteroids — Orbital Arcade",
-  description: "A little ship. An endless sky. Play Soham Roy’s Asteroids and compete on the global leaderboard.",
+  title: "Asteroids — Neon Sector",
+  description: "A neon multiplayer trail arena, offline bot practice, and classic Asteroids. Built by Soham Roy.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
