@@ -38,6 +38,10 @@ const localBindingConfig = {
 };
 
 export default defineConfig(async ({ command }) => {
+  if (process.env.ASTEROIDS_HOST === "cloudflare") {
+    const { default: config } = await import("./vite.cloudflare.config");
+    return config;
+  }
   configureToolEnvironment(process.cwd());
 
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.

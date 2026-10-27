@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check, Copy, Crosshair, Globe2, Loader2, LogOut, Radio, Rocket, Shield, Trophy, Users, Zap } from 'lucide-react';
 import { ArcadeDeck, ArcadeNotice } from "@/components/arcade-trim";
 import { addPlayer, ARENA_H, ARENA_W, arenaStep, COLORS, makeWorld, PublicPlayer, snapshot, Snapshot } from '@/lib/arena/engine';
+import { usePortalGameplay } from "@/lib/crazygames";
 type Session = { id: string; token: string; room: string };
 type Score = { rank: number; name: string; score: number; kills: number; isYou: number };
 async function request<T>(url: string, data?: unknown): Promise<T> {
@@ -37,6 +38,7 @@ export function NeonArena({ practice, name, setName }: { practice: boolean; name
   const camera = useRef({ x: ARENA_W / 2, y: ARENA_H / 2, scale: 1 }), received = useRef(0), previous = useRef<Snapshot | null>(null);
   const mounted = useRef(true), touchStart = useRef<{ x: number; y: number } | null>(null);
   const self = world?.players.find(p => p.id === session?.id), dead = !!self && !self.alive;
+  usePortalGameplay(!!session && !!self?.alive);
   const standings = world?.players.filter(p => p.alive).sort((a, b) => b.energy - a.energy || b.kills - a.kills) ?? [];
   const boardVersion = `${session?.id ?? ''}:${dead}`;
   useEffect(() => { current.current = world; }, [world]);

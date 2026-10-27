@@ -2,7 +2,7 @@
 
 This directory is the complete browser application for **Asteroids — Neon Sector**, by Soham Roy.
 
-**[Play online](https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/)** · [Repository overview](../README.md) · [Deployment guide](docs/DEPLOYMENT.md)
+[Repository overview](../README.md) · [Deployment guide](docs/DEPLOYMENT.md)
 
 ![Retro arcade cabinet](docs/preview.jpg)
 
@@ -16,28 +16,23 @@ From the GitHub repository root:
 npm install --global pnpm@11.25.0
 cd web
 pnpm install --frozen-lockfile
-pnpm run build
+pnpm db:local
+pnpm dev:cloudflare
 ```
 
-The first build generates `dist/server/wrangler.json`, including the local `DB` binding. Apply both initial migrations once to the local database:
+Open the URL printed by the server. `dev:cloudflare` runs the independent Cloudflare configuration locally, with no ChatGPT hosting dependency. `db:local` applies pending checked-in SQL migrations to local D1. Production data is separate.
 
-```sh
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_equal_iceman.sql
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_large_venus.sql
-pnpm run dev
-```
-
-Open the URL printed by the server. Clean clones default to the portable execution profile; no managed-container configuration needs to be copied. `pnpm run start` previews the built Worker locally. Development and built previews share `.wrangler/state`; hosted scores use a separate database.
-
-Apply only new migrations on subsequent schema changes. Replaying the initial migration against an already initialized database produces a table-exists error. Do not delete hosted data to fix a local development issue.
+For an upload-free production build check, run `pnpm deploy:check`. To publish to your own account, follow [the deployment guide](docs/DEPLOYMENT.md).
 
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `pnpm run dev` | Local development with live reload |
-| `pnpm run build` | Build the Worker and browser assets |
-| `pnpm run start` | Preview the built Worker locally; does not deploy |
+| `pnpm dev:cloudflare` | Independent local development with live reload |
+| `pnpm build:cloudflare` | Build the independent Worker and browser assets |
+| `pnpm deploy:check` | Build and verify a deployment without uploading |
+| `pnpm deploy:cloudflare` | Deploy to your configured Cloudflare account |
+| `pnpm db:local` / `pnpm db:remote` | Apply pending D1 migrations locally / in your account |
 | `pnpm run test` | Run the gameplay, replay, API and concurrency tests |
 | `pnpm run typecheck` | Check TypeScript without emitting files |
 | `pnpm run db:generate` | Generate a new SQL migration from `db/schema.ts` |
@@ -89,7 +84,7 @@ The cabinet design uses a neon marquee, layered stickers, screw details, worn po
 | `lib/game/api.ts` | Database access, input parsing, cookies and safe JSON responses |
 | `app/api/` | Game, leaderboard and readiness routes |
 | `db/schema.ts`, `drizzle/` | SQLite schema and versioned SQL migrations |
-| `worker/index.ts`, `vite.config.ts` | Cloudflare/Vinext and managed-hosting integration |
+| `worker/cloudflare.ts`, `vite.cloudflare.config.ts` | Independent Cloudflare/Vinext deployment |
 | `tests/` | Node tests and the in-memory D1/SQLite adapter |
 
 ### Arena authority and synchronization
@@ -161,18 +156,18 @@ Returns `{entries, stats, personal, updatedAt}`. Classic rankings use the best p
 ```sh
 pnpm run test
 pnpm run typecheck
-pnpm run build
+pnpm deploy:check
 ```
 
-The current **12 tests** cover gameplay, replay determinism, malformed recordings, forged scores, duplicate saves, expiry, arena pickups/boosts/deaths, independent clients, concurrent joins, capacity, disconnections, records and readiness. Tests import real route handlers and execute their SQL against isolated, in-memory SQLite databases. No test fixture is added to production.
+The current **13 tests** cover gameplay, replay determinism, malformed recordings, forged scores, duplicate saves, expiry, arena pickups/boosts/deaths, independent clients, concurrent joins, capacity, disconnections, records and readiness. Tests import real route handlers and execute their SQL against isolated, in-memory SQLite databases. No test fixture is added to production.
 
 ## Hosting and releases
 
 See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the production service, release procedure, database migration rules, readiness checks and rollback considerations.
 
-The app currently runs as a Cloudflare Worker with D1 through ChatGPT Sites. `.openai/hosting.json` declares the existing Site and logical `DB` binding. A frontend-only deployment is insufficient. GitHub merges do not automatically publish the current Site; its source state must be synchronized and explicitly deployed through the managed hosting workflow.
+Deploy the independent Worker and D1 database into your own Cloudflare account, then submit its HTTPS URL to CrazyGames for review. The current managed preview is separate; an account-owned deployment and a portal listing are not created by merging code alone. The independent build does not require ChatGPT authentication or connectors. Legacy preview tooling remains available separately.
 
-No game API keys or public database credentials are needed. Keep any future hosted secrets in runtime configuration, never in client source or Git. Preserve the framework's Sites build integration.
+See [CrazyGames submission copy](docs/CRAZYGAMES.md) for draft listing details and the remaining review materials. Portal mode (`?platform=crazygames`) enables SDK loading/gameplay events. Native Friends, ads and portal-native leaderboards are not integrated.
 
 ## Known limits
 

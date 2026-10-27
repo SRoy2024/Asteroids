@@ -5,6 +5,7 @@ import { ArcadeMarquee, ArcadeTicker, ArcadeClutter } from "@/components/arcade-
 import { NeonArena } from "@/components/arena/neon-arena";
 import { CanvasHandle, Flight, GameCanvas } from "@/components/game/game-canvas";
 import { INPUT, MAX_FRAMES } from "@/lib/game/engine";
+import { usePortalGameplay } from "@/lib/crazygames";
 type Entry = { name: string; score: number; frames: number; rank: number; isYou: number };
 type Board = { entries: Entry[]; stats: { flights: number; pilots: number; record: number }; personal: { best: number; flights: number }; updatedAt: number };
 type Run = { id: string; token: string; seed: number };
@@ -127,6 +128,7 @@ export default function Home() {
     try { if (document.fullscreenElement) await document.exitFullscreen(); else if (arena.current?.requestFullscreen) await arena.current.requestFullscreen(); else setError("Fullscreen is unavailable in this browser. Try rotating your phone."); }
     catch { setError("Fullscreen is unavailable here. You can still play in the window."); }
   }
+  usePortalGameplay(mode === "classic" && phase === "playing");
   const active = phase === "playing" || phase === "paused";
   return <main className="app-shell retro-cabinet" data-crt={crtFx ? "on" : "off"}>
     <header className="topbar">

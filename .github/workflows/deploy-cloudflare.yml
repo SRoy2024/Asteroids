@@ -1,0 +1,35 @@
+name: Deploy Asteroids to Cloudflare
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: asteroids-cloudflare-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: web
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test && pnpm typecheck
+      - name: Configure account-owned database
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Set the Cloudflare deployment secrets first.'; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_D1_DATABASE_ID"
+          pnpm cloudflare:configure "$CLOUDFLARE_D1_DATABASE_ID" "$CLOUDFLARE_ACCOUNT_ID"
+      - run: pnpm db:remote
+      - run: pnpm deploy:cloudflare

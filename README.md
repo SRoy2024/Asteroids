@@ -4,7 +4,7 @@
 
 Built by **Soham Roy**. The original Python/Pygame game is preserved at the repository root; the web application lives in [`web/`](web/).
 
-**[Play the live game](https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/)** · [Web development guide](web/README.md) · [Deployment guide](web/docs/DEPLOYMENT.md)
+[Web development guide](web/README.md) · [Deployment guide](web/docs/DEPLOYMENT.md)
 
 ![Asteroids retro arcade cabinet](web/docs/preview.jpg)
 
@@ -51,7 +51,7 @@ Cyan, purple, magenta and red neon surround a cabinet-style marquee, worn sticke
 | Interface | React 19, TypeScript, CSS, Lucide icons |
 | Rendering | Canvas 2D; fixed-step game simulations |
 | Web framework | Vinext, using Next.js-compatible routing and Vite |
-| Hosted API | Cloudflare Worker through ChatGPT Sites |
+| Hosted API | Account-owned Cloudflare Worker |
 | Persistent storage | Cloudflare D1 / SQLite |
 | Schema | Drizzle and checked-in SQL migrations |
 | Tests | Node's built-in test runner and in-memory SQLite |
@@ -76,20 +76,11 @@ npm install --global pnpm@11.25.0
 git clone https://github.com/SRoy2024/Asteroids.git
 cd Asteroids/web
 pnpm install --frozen-lockfile
-pnpm run build
+pnpm db:local
+pnpm dev:cloudflare
 ```
 
-Apply both migrations to the **local** database, once, in order:
-
-```sh
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_equal_iceman.sql
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_large_venus.sql
-pnpm run dev
-```
-
-Open the URL printed by the dev server. No cloud account is needed for local play. Local scores and hosted scores use separate databases. For later schema changes, apply only new migration files; do not replay migrations already applied to that local database.
-
-The local setup is not required to play the deployed game, and your laptop does not serve the public site.
+Open the URL printed by the server. No cloud account is required for local practice or development. Production runs in your own Cloudflare account; follow the deployment guide below.
 
 ## Verify the project
 
@@ -98,22 +89,20 @@ Run from `web/`:
 ```sh
 pnpm run test
 pnpm run typecheck
-pnpm run build
+pnpm deploy:check
 ```
 
-The test suite currently has **12 tests**, covering classic rules and replay determinism, API validation, forged score fields, retry behavior, arena pickups/boosts/deaths, independent clients, concurrent joins, room capacity, disconnects, leaderboard persistence, and deployment readiness. API tests execute the actual route handlers against isolated, in-memory SQLite databases. They do not submit test records to production.
+The test suite currently has **13 tests**, covering classic rules and replay determinism, API validation, forged score fields, retry behavior, arena pickups/boosts/deaths, independent clients, concurrent joins, room capacity, disconnects, leaderboard persistence, and deployment readiness. API tests execute the actual route handlers against isolated, in-memory SQLite databases. They do not submit test records to production.
 
 ## Production deployment
 
-The current public deployment runs in **ChatGPT Sites**, using a Cloudflare Worker and a persistent D1 database. The web manifest at [`web/.openai/hosting.json`](web/.openai/hosting.json) identifies the existing Site and the `DB` binding.
+The independent deployment runs the game and API in **your Cloudflare Workers account**, with **your D1 database**. It does not require ChatGPT hosting, login or connectors. [Deploy from this guide](web/docs/DEPLOYMENT.md); it covers account login, D1 creation, migrations, an upload-free build check, publishing and verification.
 
-- **Live game:** https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/
-- **Readiness:** https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/api/health
-- **Release procedure:** [`web/docs/DEPLOYMENT.md`](web/docs/DEPLOYMENT.md).
+After verifying the account-owned URL, submit it to **CrazyGames** for review. [Draft listing and reviewer notes](web/docs/CRAZYGAMES.md) are included. Portal mode adds CrazyGames SDK v3 loading and gameplay events. A deployed URL is not a published portal listing: developer account setup, promotional assets, embedded testing and review are still required.
 
-A GitHub merge does **not** automatically publish this Site. A release must explicitly synchronize, build, save, and deploy the intended source version. The hosting workflow provisions the database binding and applies pending migrations. No hosted database credentials are committed.
+A manual **Deploy Asteroids to Cloudflare** GitHub Actions workflow is provided. Configure your account secrets before running it; merging does not silently deploy. The older ChatGPT Sites preview remains a separate legacy deployment until it is retired after migration. Scores do not automatically transfer to your new database.
 
-This application uses server-side routes and D1; uploading the frontend alone to GitHub Pages or an ordinary static host will not provide ranked play or multiplayer.
+This application needs its Worker API and D1. A frontend-only static upload cannot supply multiplayer or ranked score verification. The current polling-based arena needs load testing before a high-traffic portal launch; free-tier quotas are finite.
 
 ## Project layout
 
