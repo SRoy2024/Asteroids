@@ -62,3 +62,17 @@ test('API verifies actual replay, rejects tampering, saves once, and ranks in SQ
     console.log(`Verified flight: ${state.score} points over ${state.frame} frames.`);
   } finally { mock.timers.reset(); }
 });
+
+test('readiness requires the deployed schema and reveals no player data', async () => {
+  const { GET: health } = await import('../app/api/health/route.ts');
+  const healthy = await health();
+  assert.equal(healthy.status, 200);
+  assert.deepEqual(await healthy.json(), { status: 'ok', service: 'Asteroids — Neon Sector', database: 'ready' });
+  assert.equal(healthy.headers.get('cache-control'), 'no-store');
+  sqlite.exec('ALTER TABLE arena_rooms RENAME TO missing_arena_rooms');
+  try {
+    const unavailable = await health();
+    assert.equal(unavailable.status, 503);
+    assert.deepEqual(await unavailable.json(), { status: 'unavailable', service: 'Asteroids — Neon Sector', database: 'not_ready' });
+  } finally { sqlite.exec('ALTER TABLE missing_arena_rooms RENAME TO arena_rooms'); }
+});
