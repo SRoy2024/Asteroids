@@ -39,7 +39,7 @@ Located in [`release-assets/`](release-assets/):
 
 ### Option A: Direct In-Browser HTML5 Play (Recommended for itch.io)
 
-1. Go to **[itch.io/game/new](https://itch.io/game/new)** (log in or create an account).
+1. Go to **[sohmroy.itch.io/asteroid-fighter](https://sohmroy.itch.io/asteroid-fighter)** (Edit game).
 2. Set up the basic information:
    - **Title**: `Asteroids: Neon Sector`
    - **Classification**: `Games`
