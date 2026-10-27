@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Local and temporary build output
+dist-itch/
+web/dist-itch-online/
+.wrangler/
+.next/
+.vinext/
+dist/

@@ -20,7 +20,9 @@
     "db:local": "node scripts/cloudflare.mjs db:local",
     "db:remote": "node scripts/cloudflare.mjs db:remote",
     "deploy:cloudflare": "node scripts/cloudflare.mjs deploy",
-    "deploy:check": "node scripts/cloudflare.mjs dry-run"
+    "deploy:check": "node scripts/cloudflare.mjs dry-run",
+    "build:static": "vite build --config vite.standalone.config.ts",
+    "package:all": "node scripts/build-releases.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

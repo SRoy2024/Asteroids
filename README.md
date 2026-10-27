@@ -4,7 +4,7 @@
 
 Built by **Soham Roy**. The original Python/Pygame game is preserved at the repository root; the web application lives in [`web/`](web/).
 
-[Web development guide](web/README.md) · [Deployment guide](web/docs/DEPLOYMENT.md)
+[Web development guide](web/README.md) · [Deployment guide](web/docs/DEPLOYMENT.md) · [itch.io & CrazyGames Deployment Guide](DEPLOYMENT_PLATFORMS.md)
 
 ![Asteroids retro arcade cabinet](web/docs/preview.jpg)
 
@@ -103,6 +103,20 @@ After verifying the account-owned URL, submit it to **CrazyGames** for review. [
 A manual **Deploy Asteroids to Cloudflare** GitHub Actions workflow is provided. Configure your account secrets before running it; merging does not silently deploy. The older ChatGPT Sites preview remains a separate legacy deployment until it is retired after migration. Scores do not automatically transfer to your new database.
 
 This application needs its Worker API and D1. A frontend-only static upload cannot supply multiplayer or ranked score verification. The current polling-based arena needs load testing before a high-traffic portal launch; free-tier quotas are finite.
+
+## itch.io & CrazyGames Deployment
+
+Complete, ready-to-upload bundles and formatted covers are included in this repository:
+
+- 🎮 **itch.io**: Upload [`release-packages/asteroids-itch-html5.zip`](release-packages/asteroids-itch-html5.zip) as an in-browser playable game on [itch.io](https://itch.io/game/new) (Kind of project: HTML, Viewport: 1280x720, Fullscreen enabled). Cover: [`release-assets/itch-cover-630x500.png`](release-assets/itch-cover-630x500.png).
+- 🕹️ **CrazyGames**: Submit to [CrazyGames Developer Portal](https://developer.crazygames.com) using your verified Cloudflare URL with `?platform=crazygames` (or upload [`release-packages/asteroids-crazygames-html5.zip`](release-packages/asteroids-crazygames-html5.zip)). Formatted 512x512, 800x450, and 600x800 covers are in [`release-assets/`](release-assets/).
+- 📖 **Comprehensive Deployment Guide & Listing Copy**: See [`DEPLOYMENT_PLATFORMS.md`](DEPLOYMENT_PLATFORMS.md).
+
+To rebuild all release packages at any time:
+```sh
+cd web
+pnpm package:all
+```
 
 ## Project layout
 
