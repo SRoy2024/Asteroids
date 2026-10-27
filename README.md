@@ -6,6 +6,8 @@ A Python/Pygame Asteroids game by **Soham Roy**, now extended with a playable br
 
 ## Browser edition
 
+**[Play online](https://asteroids-orbital-arcade.dusky-dace-1132.chatgpt.site/)** — publicly playable, with a persistent global leaderboard.
+
 Open [`web/README.md`](web/README.md) for setup, controls, architecture, API documentation, testing, deployment, and a project demo walkthrough.
 
 - Responsive arcade interface with keyboard and touch controls.
