@@ -46,3 +46,11 @@ export async function body(request: Request) {
     return data;
   } catch { throw new ApiError("Invalid JSON."); }
 }
+
+// HTTPS portal embeds need a partitioned cookie. Origin checks and per-run
+// secret tokens still protect every mutation; no cross-origin API is exposed.
+export function pilotCookie(request: Request, pilot: string) {
+  const policy = new URL(request.url).protocol === "https:"
+    ? "SameSite=None; Secure; Partitioned" : "SameSite=Lax";
+  return `orbital-pilot=${pilot}; HttpOnly; ${policy}; Path=/; Max-Age=31536000`;
+}

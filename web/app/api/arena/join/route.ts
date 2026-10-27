@@ -1,4 +1,4 @@
-import { ApiError, body, database, digest, failure, getPilot, json } from '@/lib/game/api';
+import { ApiError, body, database, digest, failure, getPilot, json, pilotCookie } from '@/lib/game/api';
 import { addPlayer, makeWorld, ROOM_LIMIT, snapshot, type World } from '@/lib/arena/engine';
 import { mutateRoom } from '@/lib/arena/server';
 export async function POST(request: Request) {
@@ -38,6 +38,6 @@ export async function POST(request: Request) {
       addPlayer(w, { id, pilot, tokenHash, name, color: data.color }, current);
       return snapshot(w, code, id);
     });
-    return json({ id, token, room: code, world }, 201, { 'Set-Cookie': `orbital-pilot=${pilot}; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000${new URL(request.url).protocol === 'https:' ? '; Secure' : ''}` });
+    return json({ id, token, room: code, world }, 201, { 'Set-Cookie': pilotCookie(request, pilot) });
   } catch (error) { return failure(error); }
 }

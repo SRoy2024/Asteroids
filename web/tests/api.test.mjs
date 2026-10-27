@@ -27,7 +27,7 @@ test('API verifies actual replay, rejects tampering, saves once, and ranks in SQ
     assert.equal((await request(start, '/api/runs', { name: 'QA' }, { Origin: 'https://attacker.test' })).status, 403);
     assert.equal((await request(start, '/api/runs', { name: 'QA' }, { 'Content-Type': 'text/plain' })).status, 415);
     const started = await request(start, '/api/runs', { name: 'QA Pilot' });
-    assert.equal(started.status, 201); assert.match(started.cookie, /HttpOnly/); assert.match(started.cookie, /Secure/);
+    assert.equal(started.status, 201); assert.match(started.cookie, /HttpOnly/); assert.match(started.cookie, /Secure/); assert.match(started.cookie, /SameSite=None/); assert.match(started.cookie, /Partitioned/);
     const run = started.data, state = createGame(run.seed), controls = []; let previous = -1;
     while (!state.ended) {
       const input = INPUT.FIRE | INPUT.THRUST | (state.frame % 400 < 250 ? INPUT.LEFT : INPUT.RIGHT);
@@ -75,4 +75,18 @@ test('readiness requires the deployed schema and reveals no player data', async 
     assert.equal(unavailable.status, 503);
     assert.deepEqual(await unavailable.json(), { status: 'unavailable', service: 'Asteroids — Neon Sector', database: 'not_ready' });
   } finally { sqlite.exec('ALTER TABLE missing_arena_rooms RENAME TO arena_rooms'); }
+});
+
+
+test('pilot cookies support HTTPS embeds and local HTTP without changing origin validation', async () => {
+  const { pilotCookie, body } = await import('../lib/game/api.ts');
+  const id = crypto.randomUUID();
+  const https = pilotCookie(new Request('https://arcade.test'), id);
+  assert.match(https, /HttpOnly; SameSite=None; Secure; Partitioned; Path=\//);
+  assert.doesNotMatch(https, /Domain=/);
+  const local = pilotCookie(new Request('http://localhost:5173'), id);
+  assert.match(local, /SameSite=Lax/); assert.doesNotMatch(local, /Secure|Partitioned/);
+  await assert.rejects(body(new Request('https://arcade.test/api/runs', {
+    method: 'POST', headers: { Origin: 'https://www.crazygames.com', 'Content-Type': 'application/json' }, body: '{}'
+  })), /Cross-site request rejected/);
 });

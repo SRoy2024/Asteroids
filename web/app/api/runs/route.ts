@@ -1,4 +1,4 @@
-import { ApiError, body, database, digest, failure, getPilot, json } from "@/lib/game/api";
+import { ApiError, body, database, digest, failure, getPilot, json, pilotCookie } from "@/lib/game/api";
 export async function POST(request: Request) {
   try {
     const data = await body(request);
@@ -14,7 +14,6 @@ export async function POST(request: Request) {
     const id = crypto.randomUUID(), token = crypto.randomUUID(), seed = crypto.getRandomValues(new Uint32Array(1))[0];
     await db.prepare("INSERT INTO runs (id, pilot, token_hash, name, seed, created_at, ip_hash) VALUES (?, ?, ?, ?, ?, ?, ?)")
       .bind(id, pilot, await digest(token), name, seed, now, ipHash).run();
-    const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
-    return json({ id, token, seed }, 201, { "Set-Cookie": `orbital-pilot=${pilot}; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000${secure}` });
+    return json({ id, token, seed }, 201, { "Set-Cookie": pilotCookie(request, pilot) });
   } catch (error) { return failure(error); }
 }

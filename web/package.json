@@ -13,7 +13,14 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "test": "node --experimental-strip-types --test tests/*.test.ts tests/*.test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev:cloudflare": "node scripts/cloudflare.mjs dev",
+    "build:cloudflare": "node scripts/cloudflare.mjs build",
+    "cloudflare:configure": "node scripts/cloudflare.mjs configure",
+    "db:local": "node scripts/cloudflare.mjs db:local",
+    "db:remote": "node scripts/cloudflare.mjs db:remote",
+    "deploy:cloudflare": "node scripts/cloudflare.mjs deploy",
+    "deploy:check": "node scripts/cloudflare.mjs dry-run"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
