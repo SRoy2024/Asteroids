@@ -88,6 +88,31 @@ The SDK events are a foundation for initial QA, **not a claim of Full Launch or 
 
 Required portal materials include landscape, portrait and square cover art plus gameplay preview video. `docs/preview.jpg` is a reference screenshot, not a complete promotional asset set. Account setup, developer agreements, final asset uploads, and submission review remain required. Acceptance is decided by CrazyGames; deploying a URL does not create a CrazyGames listing.
 
+## Deploy from the Cloudflare dashboard (no local terminal)
+
+The checked-in account and database IDs now target the owner-provided Cloudflare account. They do not grant access by themselves. Use your existing signed-in browser to connect the repository; no remote-browser login is needed.
+
+Before connecting, create a user API token in Cloudflare **My Profile → API Tokens**. Start from **Edit Cloudflare Workers**, add **Account → D1 → Edit**, and restrict account resources to your own account. Workers Builds' automatically generated token does not include D1 permission, so it cannot run the migration command below. Keep the token in Cloudflare's token selector/secure field; never put it in Git or chat.
+
+In **Workers & Pages → Create application**, choose the GitHub repository connection and select `SRoy2024/Asteroids`. Use these settings:
+
+| Setting | Value |
+| --- | --- |
+| Worker name | `asteroids-neon-sector` |
+| Production branch | `main` |
+| Root directory | `web` |
+| Build command | `pnpm build:cloudflare` |
+| Deploy command | `pnpm db:remote && pnpm exec wrangler deploy --config dist/server/wrangler.json` |
+| API token | Your account-scoped Workers + D1 Edit token |
+
+The repository pins pnpm through `packageManager` and Node 24 through `.node-version`. If the setup form offers build variables, you can explicitly set `NODE_VERSION=24` and `PNPM_VERSION=11.25.0` there as well. Cloudflare installs dependencies before the build command. Do not use the legacy `pnpm build` command for this deployment.
+
+The deploy command applies only pending D1 migrations and then publishes the already-built Worker. Keep preview/non-production branch deployments disabled until a separate preview database is configured: these settings target the production database. Once Git integration is active, subsequent pushes to the production branch can deploy automatically; coordinate releases accordingly.
+
+After deployment, save the actual URL Cloudflare gives you and perform the verification steps above. If a build fails, share the relevant error text, excluding any tokens. A successful build without a successful deployment and a healthy API is not a completed migration.
+
+References: [Workers Builds configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/), [build image and version pins](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/).
+
 ## Optional GitHub Actions deployment
 
 The root repository includes `.github/workflows/deploy-cloudflare.yml`. It runs manually from Actions; merging code does not silently deploy. Add these **repository/environment secrets** under GitHub Settings → Secrets and variables → Actions:

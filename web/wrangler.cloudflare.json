@@ -11,11 +11,12 @@
     {
       "binding": "DB",
       "database_name": "asteroids-neon-sector",
-      "database_id": "00000000-0000-4000-8000-000000000000",
+      "database_id": "09fac386-b30a-4d3d-981e-be3d9034a665",
       "migrations_dir": "drizzle"
     }
   ],
   "observability": {
     "enabled": true
-  }
+  },
+  "account_id": "dfba680d336552fcc3e22357dc00a719"
 }
